@@ -84,7 +84,7 @@ app.use('/auth', authRoutes);
 app.use('/api/tables', tableRoutes(io));
 app.use('/api/queue', queueRoutes(io, userSockets));
 
-const path = require('path');
+
 
 if (process.env.NODE_ENV === 'production') {
   const frontendBuildPath = path.join(__dirname, '../frontend/build');
