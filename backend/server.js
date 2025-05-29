@@ -29,12 +29,20 @@ console.log('Serving static files from:', path.join(__dirname, '../frontend/buil
 // Always serve frontend build
 const frontendBuildPath = path.join(__dirname, '../frontend/build');
 app.use(express.static(frontendBuildPath));
-
+console.log("This log should go now")
 // Fallback: send index.html for any unmatched route
-app.get('/*', function (req, res) {
-  console.debug(`[DEBUG] Fallback hit: serving index.html`);
-  res.sendFile(path.join(frontendBuildPath, 'index.html'));
+app.get('*', (req, res, next) => {
+  const indexPath = path.join(__dirname, '../frontend/build', 'index.html');
+  console.log('Sending fallback index.html:', indexPath);
+
+  res.sendFile(indexPath, function (err) {
+    if (err) {
+      console.error('Error sending index.html:', err);
+      next(err);
+    }
+  });
 });
+
 
 console.log(`[DEBUG] Serving static files from: ${frontendBuildPath}`);
 
