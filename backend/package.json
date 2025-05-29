@@ -1,7 +1,6 @@
 {
     "scripts": {
       "start": "node server.js",
-       "heroku-postbuild": "cd frontend && npm install && npm run build"
   },
   "dependencies": {
     "cookie-session": "^2.1.0",
