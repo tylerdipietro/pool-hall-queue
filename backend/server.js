@@ -23,6 +23,14 @@ const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:3000';
 const SKIP_TIMEOUT = 30 * 1000; // 30 seconds
 
 const app = express();
+// Add this near the top of your main file, right after `const app = express();`
+
+const originalUse = app.use.bind(app);
+app.use = function (...args) {
+  console.log('[DEBUG] app.use() called with:', args[0]);
+  return originalUse(...args);
+};
+
 const server = http.createServer(app);
 
 // Initialize Socket.IO server with CORS
@@ -56,8 +64,8 @@ app.use(
 );
 
 
-//app.use(passport.initialize());
-//app.use(passport.session());
+app.use(passport.initialize());
+app.use(passport.session());
 
 // API routes
 app.use('/auth', authRoutes);
