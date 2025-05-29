@@ -24,7 +24,17 @@ const SKIP_TIMEOUT = 30 * 1000; // 30 seconds
 
 const app = express();
 // Add this near the top of your main file, right after `const app = express();`
+if (process.env.NODE_ENV === 'production') {
+  const frontendBuildPath = path.join(__dirname, '../frontend/build');
 
+  // Serve static files
+  app.use(express.static(frontendBuildPath));
+
+  // Serve index.html for any other unmatched route
+  app.get('/*', function (req, res) {
+    res.sendFile(path.join(frontendBuildPath, 'index.html'));
+  });
+}
 const originalUse = app.use.bind(app);
 app.use = function (...args) {
   console.log('[DEBUG] app.use() called with:', args[0]);
@@ -62,6 +72,7 @@ app.use(
     },
   })
 );
+
 
 
 app.use(passport.initialize());
