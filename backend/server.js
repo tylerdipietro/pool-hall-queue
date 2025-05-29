@@ -30,6 +30,11 @@ if (process.env.NODE_ENV === 'production') {
 
   // Serve static files
   app.use(express.static(frontendBuildPath));
+  
+  app.use((req, res, next) => {
+  console.debug(`[DEBUG] Request received: ${req.method} ${req.url}`);
+  next();
+});
 
   // Serve index.html for any other unmatched route
   app.get('/*', function (req, res) {
