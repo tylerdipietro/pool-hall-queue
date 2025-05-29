@@ -25,7 +25,7 @@ const SKIP_TIMEOUT = 30 * 1000; // 30 seconds
 
 const app = express();
 console.log('__dirname:', __dirname);
-
+console.log('Serving static files from:', path.join(__dirname, '../frontend/build'));
 // Always serve frontend build
 const frontendBuildPath = path.join(__dirname, '../frontend/build');
 app.use(express.static(frontendBuildPath));
