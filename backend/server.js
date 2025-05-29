@@ -19,44 +19,50 @@ const { recordMatch } = require('./utils/matchHistory');
 const assignUsersToTables = require('./services/assignUsersToTables');
 require('./services/passport');
 
+const app = express();
+
+// Environment variables
 const PORT = process.env.PORT || 5000;
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:3000';
 const SKIP_TIMEOUT = 30 * 1000; // 30 seconds
 
-const app = express();
-console.log('__dirname:', __dirname);
-console.log('Serving static files from:', path.join(__dirname, '../frontend/build'));
-// Always serve frontend build
-const frontendBuildPath = path.join(__dirname, '../frontend/build');
+// Middleware setup
+app.use(cors({ origin: CLIENT_ORIGIN, credentials: true }));
+app.use(express.json());
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'your_secret_key_here',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    },
+  })
+);
 
-app.use((req, res, next) => {
-  try {
-    next();
-  } catch (err) {
-    console.error('Error in request middleware:', err);
-    res.status(500).send('Internal server error');
-  }
+
+// Serve static files from React frontend
+app.use(express.static(path.join(__dirname, 'build')));
+
+// API routes here
+// app.get('/api/some-route', ...)
+// API routes
+app.use('/auth', authRoutes);
+app.use('/api/tables', tableRoutes(io));
+app.use('/api/queue', queueRoutes(io, userSockets));
+
+// Catch-all handler to serve React app
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-app.use(express.static(frontendBuildPath));
-console.log("This log should go now")
-app.use((req, res, next) => {
-  console.log(`Incoming request: ${req.method} ${req.url}`);
-  next();
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Client Origin: ${CLIENT_ORIGIN}`);
+  console.log(`Skip Timeout: ${SKIP_TIMEOUT}ms`);
 });
-// Fallback: send index.html for any unmatched route
-app.get('*', (req, res, next) => {
-  const indexPath = path.join(__dirname, '../frontend/build', 'index.html');
-  console.log('Sending fallback index.html:', indexPath);
-
-  res.sendFile(indexPath, function (err) {
-    if (err) {
-      console.error('Error sending index.html:', err);
-      next(err);
-    }
-  });
-});
-
 
 console.log(`[DEBUG] Serving static files from: ${frontendBuildPath}`);
 
@@ -83,39 +89,11 @@ const userSockets = new Map();
 app.set('io', io);
 app.set('userSockets', userSockets);
 
-// Middleware setup
-app.use(cors({ origin: CLIENT_ORIGIN, credentials: true }));
-app.use(express.json());
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'your_secret_key_here',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    },
-  })
-);
 
 
 
 app.use(passport.initialize());
 app.use(passport.session());
-
-// API routes
-app.use('/auth', authRoutes);
-app.use('/api/tables', tableRoutes(io));
-app.use('/api/queue', queueRoutes(io, userSockets));
-
-
-
-if (process.env.NODE_ENV === 'production') {
-  const frontendBuildPath = path.join(__dirname, '../frontend/build');
-  app.use(express.static(frontendBuildPath));
-
-  ;
-}
 
 // Connect to MongoDB and start server
 mongoose
