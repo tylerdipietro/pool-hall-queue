@@ -24,7 +24,8 @@ const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:3000';
 const SKIP_TIMEOUT = 30 * 1000; // 30 seconds
 
 const app = express();
-// Add this near the top of your main file, right after `const app = express();`
+console.log('__dirname:', __dirname);
+
 // Always serve frontend build
 const frontendBuildPath = path.join(__dirname, '../frontend/build');
 app.use(express.static(frontendBuildPath));
