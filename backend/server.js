@@ -30,6 +30,10 @@ console.log('Serving static files from:', path.join(__dirname, '../frontend/buil
 const frontendBuildPath = path.join(__dirname, '../frontend/build');
 app.use(express.static(frontendBuildPath));
 console.log("This log should go now")
+app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.url}`);
+  next();
+});
 // Fallback: send index.html for any unmatched route
 app.get('*', (req, res, next) => {
   const indexPath = path.join(__dirname, '../frontend/build', 'index.html');
