@@ -39,8 +39,9 @@ router.post('/:tableId/won', ensureAuth, async (req, res) => {
   const { tableId } = req.params;
   const { userId } = req.body;
 
-  const io = req.app.locals.io;
-  const userSockets = req.app.locals.userSockets;
+  const io = req.app.get('io');
+  const userSockets = req.app.get('userSockets');
+
 
   if (!userId) return res.status(400).json({ message: 'Missing userId in request body' });
 
