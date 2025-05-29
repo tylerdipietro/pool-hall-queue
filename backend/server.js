@@ -76,7 +76,7 @@ const path = require('path');
 
 // Serve static files from frontend build in production
 if (process.env.NODE_ENV === 'production') {
-  const frontendPath = path.join(__dirname, 'public');
+  const frontendPath = path.join(__dirname, '../frontend/public');
   app.use(express.static(frontendPath));
 
   app.get('*', (req, res) => {
