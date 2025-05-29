@@ -295,10 +295,10 @@ router.post('/accept', ensureAuth, async (req, res) => {
     await emitQueueUpdate(io);
     io.emit('tablesUpdated');
 
-    res.json({ message: 'Successfully joined the table' });
+    return res.json({ message: 'Successfully joined the table' });
   } catch (err) {
     console.error('Accept Error:', err);
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 });
 
