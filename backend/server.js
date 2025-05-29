@@ -28,6 +28,16 @@ console.log('__dirname:', __dirname);
 console.log('Serving static files from:', path.join(__dirname, '../frontend/build'));
 // Always serve frontend build
 const frontendBuildPath = path.join(__dirname, '../frontend/build');
+
+app.use((req, res, next) => {
+  try {
+    next();
+  } catch (err) {
+    console.error('Error in request middleware:', err);
+    res.status(500).send('Internal server error');
+  }
+});
+
 app.use(express.static(frontendBuildPath));
 console.log("This log should go now")
 app.use((req, res, next) => {
