@@ -74,16 +74,12 @@ app.use('/api/queue', queueRoutes(io, userSockets));
 
 const path = require('path');
 
-/*// Serve static files from frontend build in production
 if (process.env.NODE_ENV === 'production') {
-  const frontendPath = path.join(__dirname, '../frontend/public');
-  app.use(express.static(frontendPath));
+  const frontendBuildPath = path.join(__dirname, '../frontend/build');
+  app.use(express.static(frontendBuildPath));
 
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(frontendPath, 'index.html'));
-  });
-}*/
-
+  ;
+}
 
 // Connect to MongoDB and start server
 mongoose
