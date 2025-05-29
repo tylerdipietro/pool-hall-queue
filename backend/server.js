@@ -24,7 +24,11 @@ const SKIP_TIMEOUT = 30 * 1000; // 30 seconds
 
 const app = express();
 const server = http.createServer(app);
-const activeConfirmations = new Set();
+
+routes.forEach(route => {
+  console.log('Registering route:', route);  // 👈 Debug log
+  app.get(route, (req, res) => res.send('OK'));
+});
 
 // Initialize Socket.IO server with CORS
 const io = new Server(server, {
