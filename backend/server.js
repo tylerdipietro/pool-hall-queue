@@ -25,22 +25,18 @@ const SKIP_TIMEOUT = 30 * 1000; // 30 seconds
 
 const app = express();
 // Add this near the top of your main file, right after `const app = express();`
-if (process.env.NODE_ENV === 'production') {
-  const frontendBuildPath = path.join(__dirname, '../frontend/build');
+// Always serve frontend build
+const frontendBuildPath = path.join(__dirname, '../frontend/build');
+app.use(express.static(frontendBuildPath));
 
-  // Serve static files
-  app.use(express.static(frontendBuildPath));
-  
-  app.use((req, res, next) => {
-  console.debug(`[DEBUG] Request received: ${req.method} ${req.url}`);
-  next();
+// Fallback: send index.html for any unmatched route
+app.get('/*', function (req, res) {
+  console.debug(`[DEBUG] Fallback hit: serving index.html`);
+  res.sendFile(path.join(frontendBuildPath, 'index.html'));
 });
 
-  // Serve index.html for any other unmatched route
-  app.get('/*', function (req, res) {
-    res.sendFile(path.join(frontendBuildPath, 'index.html'));
-  });
-}
+console.log(`[DEBUG] Serving static files from: ${frontendBuildPath}`);
+
 const originalUse = app.use.bind(app);
 app.use = function (...args) {
   console.log('[DEBUG] app.use() called with:', args[0]);
